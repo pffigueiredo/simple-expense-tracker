@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,16 +5,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { ThemeProvider } from '@/components/ThemeProvider';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { trpc } from '@/utils/trpc';
 import { useState, useEffect, useCallback } from 'react';
 import type { Expense, CreateExpenseInput, ExpenseCategory } from '../../server/src/schema';
 
 const categoryColors: Record<ExpenseCategory, string> = {
-  'Food': 'bg-green-100 text-green-800',
-  'Transport': 'bg-blue-100 text-blue-800',
-  'Utilities': 'bg-yellow-100 text-yellow-800',
-  'Entertainment': 'bg-purple-100 text-purple-800',
-  'Shopping': 'bg-pink-100 text-pink-800'
+  'Food': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+  'Transport': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+  'Utilities': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+  'Entertainment': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+  'Shopping': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300'
 };
 
 const categoryIcons: Record<ExpenseCategory, string> = {
@@ -26,7 +27,7 @@ const categoryIcons: Record<ExpenseCategory, string> = {
   'Shopping': '🛍️'
 };
 
-function App() {
+function ExpenseApp() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -82,22 +83,25 @@ function App() {
   }, {} as Record<ExpenseCategory, number>);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
       <div className="container mx-auto p-6 max-w-6xl">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">💰 Expense Tracker</h1>
-          <p className="text-gray-600">Keep track of your spending with ease</p>
+        <div className="flex justify-between items-center mb-8">
+          <div className="text-center flex-1">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">💰 Expense Tracker</h1>
+            <p className="text-gray-600 dark:text-gray-300">Keep track of your spending with ease</p>
+          </div>
+          <ThemeToggle />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Add Expense Form */}
           <div className="lg:col-span-1">
-            <Card className="shadow-lg">
+            <Card className="shadow-lg border-gray-200 dark:border-gray-700">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
                   ➕ Add New Expense
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
                   Record your spending to stay on budget
                 </CardDescription>
               </CardHeader>
@@ -210,24 +214,24 @@ function App() {
             </Card>
 
             {/* Summary Card */}
-            <Card className="shadow-lg mt-6">
+            <Card className="shadow-lg mt-6 border-gray-200 dark:border-gray-700">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-gray-900 dark:text-white">
                   📊 Spending Summary
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-center mb-4">
-                  <div className="text-3xl font-bold text-gray-900">
+                  <div className="text-3xl font-bold text-gray-900 dark:text-white">
                     ${totalExpenses.toFixed(2)}
                   </div>
-                  <div className="text-gray-600">Total Spent</div>
+                  <div className="text-gray-600 dark:text-gray-400">Total Spent</div>
                 </div>
                 
                 {Object.entries(expensesByCategory).length > 0 && (
                   <div className="space-y-2">
                     {Object.entries(expensesByCategory).map(([category, amount]) => (
-                      <div key={category} className="flex justify-between items-center">
+                      <div key={category} className="flex justify-between items-center text-gray-800 dark:text-gray-200">
                         <span className="flex items-center gap-2">
                           {categoryIcons[category as ExpenseCategory]}
                           {category}
@@ -243,9 +247,9 @@ function App() {
 
           {/* Expenses List */}
           <div className="lg:col-span-2">
-            <Card className="shadow-lg">
+            <Card className="shadow-lg border-gray-200 dark:border-gray-700">
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
+                <CardTitle className="flex items-center justify-between text-gray-900 dark:text-white">
                   <span className="flex items-center gap-2">
                     📝 Recent Expenses
                   </span>
@@ -253,36 +257,36 @@ function App() {
                     {expenses.length} expense{expenses.length !== 1 ? 's' : ''}
                   </Badge>
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-gray-600 dark:text-gray-400">
                   Your spending history
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {isLoading ? (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     Loading expenses...
                   </div>
                 ) : expenses.length === 0 ? (
                   <div className="text-center py-12">
                     <div className="text-6xl mb-4">💸</div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                       No expenses yet
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-400">
                       Add your first expense to get started!
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-4 max-h-96 overflow-y-auto">
                     {expenses.map((expense: Expense) => (
-                      <div key={expense.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                      <div key={expense.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex items-center gap-3">
                             <div className="text-2xl">
                               {categoryIcons[expense.category]}
                             </div>
                             <div>
-                              <div className="font-semibold text-lg">
+                              <div className="font-semibold text-lg text-gray-900 dark:text-white">
                                 ${expense.amount.toFixed(2)}
                               </div>
                               <Badge 
@@ -293,7 +297,7 @@ function App() {
                               </Badge>
                             </div>
                           </div>
-                          <div className="text-right text-sm text-gray-600">
+                          <div className="text-right text-sm text-gray-600 dark:text-gray-400">
                             <div>{expense.date.toLocaleDateString()}</div>
                             <div className="text-xs">
                               {expense.created_at.toLocaleDateString()}
@@ -304,7 +308,7 @@ function App() {
                         {expense.description && (
                           <>
                             <Separator className="my-2" />
-                            <p className="text-gray-700 text-sm">
+                            <p className="text-gray-700 dark:text-gray-300 text-sm">
                               {expense.description}
                             </p>
                           </>
@@ -319,6 +323,14 @@ function App() {
         </div>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <ExpenseApp />
+    </ThemeProvider>
   );
 }
 
