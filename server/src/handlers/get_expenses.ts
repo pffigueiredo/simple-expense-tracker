@@ -1,9 +1,24 @@
 
+import { db } from '../db';
+import { expensesTable } from '../db/schema';
 import { type Expense } from '../schema';
+import { desc } from 'drizzle-orm';
 
 export const getExpenses = async (): Promise<Expense[]> => {
-    // This is a placeholder declaration! Real code should be implemented here.
-    // The goal of this handler is fetching all expenses from the database.
-    // It should query the expenses table, order by date (newest first), and return all expense records.
-    return [];
+  try {
+    const results = await db.select()
+      .from(expensesTable)
+      .orderBy(desc(expensesTable.date))
+      .execute();
+
+    // Convert numeric and date fields to proper types
+    return results.map(expense => ({
+      ...expense,
+      amount: parseFloat(expense.amount),
+      date: new Date(expense.date)
+    }));
+  } catch (error) {
+    console.error('Failed to fetch expenses:', error);
+    throw error;
+  }
 };
